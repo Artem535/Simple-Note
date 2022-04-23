@@ -84,7 +84,23 @@ unsigned int Storage::getFreeId() {
   return nedeedId;
 }
 
-void Storage::removeNote(QListWidgetItem *notePtr) {}
+void Storage::removeNote(QListWidgetItem *notePtr) {
+  auto findedNote{noteIds.find(notePtr)};
+  bool noteExsist = findedNote != noteIds.end();
+  if (noteExsist) {
+    auto id{QString::number(findedNote->second)};
+    // Remove text note
+    QFile::remove(notesDirectory + "/notes/" + id);
+    // Remove information abou note.
+    auto notesObject{noteInform["notes"].toObject()};
+    notesObject.remove(id);
+    noteInform["notes"] = notesObject;
+    // Add `id` in array with free id.
+    auto freeIdArray{noteInform["free id"].toArray()};
+    freeIdArray.push_back(id.toInt());
+  }
+  saveNotesInformation();
+}
 
 void Storage::addNote(QListWidgetItem *notePtr, const QString &title,
                       const QString &text) {
@@ -101,20 +117,53 @@ void Storage::addNote(QListWidgetItem *notePtr, const QString &title,
   saveNotesInformation();
 }
 
-void Storage::renameNote(QListWidgetItem *notePtr, const QString &newTitle) {}
+void Storage::renameNote(QListWidgetItem *notePtr, const QString &newTitle) {
+  auto id{QString::number(noteIds[notePtr])};
+  auto notesObject{noteInform["notes"].toObject()};
+  auto idObject{notesObject[id].toObject()};
+
+  idObject["title"] = newTitle;
+  notesObject[id] = idObject;
+  noteInform["notes"] = notesObject;
+}
 
 void Storage::changeNoteText(QListWidgetItem *notePtr, const QString &newText) {
-
+  auto findedNote{noteIds.find(notePtr)};
+  if (findedNote != noteIds.end()) {
+    QFile file(notesDirectory + "/notes/" +
+               QString::number(findedNote->second));
+    file.open(QIODevice::WriteOnly);
+    file.write(newText.toStdString().c_str());
+    file.close();
+  }
 }
 
 QString Storage::getTextFromNote(QListWidgetItem *notePtr) {
   QString result;
   // Find id note.
-  auto findNote{noteIds.find(notePtr)};
+  auto findNoteIdPtr{noteIds.find(notePtr)};
   // If we find note, read text from file and return it,
   // else return empty string.
-  if (findNote != noteIds.end()) {
+  if (findNoteIdPtr != noteIds.end()) {
+    QFile file(notesDirectory + "/notes/" +
+               QString::number(findNoteIdPtr->second));
+    file.open(QIODevice::ReadOnly);
+    result = QString(file.readAll());
+    file.close();
   }
 
   return result;
+}
+
+void Storage::addNotesFromStorage(QListWidget &widget) {
+  auto notes{noteInform["notes"].toObject()};
+  for (const auto &noteKey : notes.keys()) {
+    // Get inforamtion about note.
+    auto id{noteKey.toUInt()};
+    auto noteObject{notes[noteKey].toObject()};
+    auto title{noteObject["title"].toString()};
+    // Create new note and add it.
+    auto notePtr = new QListWidgetItem(title, &widget);
+    noteIds.insert({notePtr, id});
+  }
 }

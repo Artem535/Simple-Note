@@ -6,7 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
   // Create new buttons(`add new note`) to toolbar.
   ui->toolBar->addAction("a", this, &MainWindow::createNewNote);
-
+  // Load information from storage about notes.
+  storage.addNotesFromStorage(*ui->listWidget);
   // Connect buttons.
   connect(ui->saveButton, &QAbstractButton::clicked, this,
           &MainWindow::saveNote);

@@ -80,4 +80,10 @@ public:
    * @return
    */
   QString getTextFromNote(QListWidgetItem *notePtr);
+
+  /**
+   * @brief addNotesFromStorage
+   * @param widget
+   */
+  void addNotesFromStorage(QListWidget &widget);
 };
