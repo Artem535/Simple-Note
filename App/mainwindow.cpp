@@ -15,6 +15,18 @@ MainWindow::MainWindow(QWidget *parent)
           &MainWindow::displayNote);
   connect(ui->deleteButton, &QAbstractButton::clicked, this,
           &MainWindow::deleteNote);
+  // Set clear screen.
+  ui->tabWidget->setCurrentIndex(1);
+  // Hide tab bar.
+  ui->tabWidget->tabBar()->hide();
+  // Change style.
+  //  {
+  //    QFile file(":/res/style/MaterialDark.qss");
+  //    file.open(QIODevice::ReadOnly);
+  //    QString style{file.readAll()};
+  //    file.close();
+  //    MainWindow::setStyleSheet(style);
+  //  }
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -42,6 +54,7 @@ void MainWindow::createNewNote() {
 }
 
 void MainWindow::displayNote(QListWidgetItem *item) {
+  ui->tabWidget->setCurrentIndex(0);
   auto title{item->text()};
   toggleSaveMark(title);
   ui->titleNote->setText(title);
