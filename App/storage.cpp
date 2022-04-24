@@ -8,7 +8,7 @@ void Storage::readNotesInformation(const QString &pathToFile) {
 }
 
 void Storage::saveNotesInformation() {
-  QFile file(notesDirectory + "/inform.json");
+  QFile file(paths.inform);
   file.open(QIODevice::WriteOnly);
   QJsonDocument outputDoc;
   outputDoc.setObject(noteInform);
@@ -18,86 +18,92 @@ void Storage::saveNotesInformation() {
 
 QString Storage::getStorageDirectory() {
   auto directory{QDir::home()};
-  bool newFolderCreate = directory.mkdir(".SimpleNotes");
-  directory.cd(".SimpleNotes");
-
-  if (newFolderCreate) {
-    createFirstInitFiles(directory.path());
-  }
-
+  directory.mkdir(nameStorageDir);
+  directory.cd(nameStorageDir);
   return directory.path();
 }
 
-void Storage::createFirstInitFiles(const QString &path) {
+void Storage::createFirstInitFiles() {
   // Create notes informations.
-  QFile file{path + "/inform.json"};
+  QFile file{paths.inform};
   file.open(QIODevice::WriteOnly);
-  const QString emptyTemplate{"{\"free id\": [0], \"notes\": {}}"};
+  QString emptyTemplate{"{\"%1\": [\"0\"], \"%2\": {}}"};
+  emptyTemplate = emptyTemplate.arg(jsConst.freeId).arg(jsConst.notes);
   file.write(emptyTemplate.toStdString().c_str());
   file.close();
 
   // Create directory for text notes.
-  QDir directory{path};
-  directory.mkdir("notes");
+  QDir directory{paths.workDir};
+  directory.mkdir(jsConst.notes);
 }
 
-void Storage::addNoteInInformFile(const unsigned int &id,
-                                  const QString &title) {
+void Storage::addNoteInInformFile(const QString &id, const QString &title) {
   // Create `value`: {"path to file": ..., "title": ...}
   QJsonObject value;
-  value.insert("path to file", notesDirectory + "/" + QString::number(id));
-  value.insert("title", title);
+  value.insert(jsConst.pathToFile, getPathToText(id));
+  value.insert(jsConst.noteTitle, title);
   // Qt can't change value 'complex' object.
   // We needed get object, insert new object in array, then replace `notes`
   // object.
-  auto notesObject{noteInform["notes"].toObject()};
-  notesObject.insert(QString::number(id), value);
-  noteInform["notes"] = notesObject;
+  auto notesObject{noteInform[jsConst.notes].toObject()};
+  notesObject.insert(id, value);
+  noteInform[jsConst.notes] = notesObject;
 }
 
-void Storage::saveNoteTextFile(const unsigned int &id, const QString &text) {
-  QFile file(notesDirectory + "/notes/" + QString::number(id));
+QString Storage::getPathToText(const QString &id) {
+  return paths.notesDir + id;
+}
+
+void Storage::saveNoteTextFile(const QString &id, const QString &text) {
+  QFile file{getPathToText(id)};
   file.open(QIODevice::WriteOnly);
   file.write(text.toStdString().c_str());
   file.close();
 }
 
 Storage::Storage() {
-  auto dirPath{getStorageDirectory()};
-  readNotesInformation(dirPath + "/inform.json");
-  notesDirectory = dirPath;
+  nameStorageDir = ".SimpleNote";
+  paths.workDir = getStorageDirectory() + "/";
+  paths.notesDir = paths.workDir + "notes/";
+  paths.inform = paths.workDir + "inform.json";
+
+  if (!QFile::exists(paths.inform)) {
+    createFirstInitFiles();
+  }
+
+  readNotesInformation(paths.inform);
 }
 
-unsigned int Storage::getFreeId() {
+QString Storage::getFreeId() {
   // From `value` we get QJsonValue, convert it to array.
   // Get first element array and convert it to int.
-  auto array{noteInform.value("free id").toArray()};
-  int nedeedId{0};
+  auto array{noteInform.value(jsConst.freeId).toArray()};
+  QString neededId;
   if (array.empty()) {
-    nedeedId = noteInform["notes"].toObject().size();
+    neededId = QString::number(noteInform[jsConst.notes].toObject().size());
   } else {
-    nedeedId = array.first().toInt();
+    neededId = array.first().toString();
     array.pop_front();
     // Then replace `free id` array.
-    noteInform["free id"] = array;
+    noteInform[jsConst.freeId] = array;
   }
-  return nedeedId;
+  return neededId;
 }
 
 void Storage::removeNote(QListWidgetItem *notePtr) {
   auto findedNote{noteIds.find(notePtr)};
-  bool noteExsist = findedNote != noteIds.end();
-  if (noteExsist) {
-    auto id{QString::number(findedNote->second)};
+  bool noteExist = findedNote != noteIds.end();
+  if (noteExist) {
+    auto id{findedNote->second};
     // Remove text note
-    QFile::remove(notesDirectory + "/notes/" + id);
-    // Remove information abou note.
-    auto notesObject{noteInform["notes"].toObject()};
+    QFile::remove(getPathToText(id));
+    // Remove information about note.
+    auto notesObject{noteInform[jsConst.notes].toObject()};
     notesObject.remove(id);
-    noteInform["notes"] = notesObject;
+    noteInform[jsConst.notes] = notesObject;
     // Add `id` in array with free id.
-    auto freeIdArray{noteInform["free id"].toArray()};
-    freeIdArray.push_back(id.toInt());
+    auto freeIdArray{noteInform[jsConst.freeId].toArray()};
+    freeIdArray.push_back(id);
   }
   saveNotesInformation();
 }
@@ -118,20 +124,19 @@ void Storage::addNote(QListWidgetItem *notePtr, const QString &title,
 }
 
 void Storage::renameNote(QListWidgetItem *notePtr, const QString &newTitle) {
-  auto id{QString::number(noteIds[notePtr])};
-  auto notesObject{noteInform["notes"].toObject()};
+  auto id{noteIds[notePtr]};
+  auto notesObject{noteInform[jsConst.notes].toObject()};
   auto idObject{notesObject[id].toObject()};
 
-  idObject["title"] = newTitle;
+  idObject[jsConst.noteTitle] = newTitle;
   notesObject[id] = idObject;
-  noteInform["notes"] = notesObject;
+  noteInform[jsConst.notes] = notesObject;
 }
 
 void Storage::changeNoteText(QListWidgetItem *notePtr, const QString &newText) {
   auto findedNote{noteIds.find(notePtr)};
   if (findedNote != noteIds.end()) {
-    QFile file(notesDirectory + "/notes/" +
-               QString::number(findedNote->second));
+    QFile file(getPathToText(findedNote->second));
     file.open(QIODevice::WriteOnly);
     file.write(newText.toStdString().c_str());
     file.close();
@@ -145,8 +150,7 @@ QString Storage::getTextFromNote(QListWidgetItem *notePtr) {
   // If we find note, read text from file and return it,
   // else return empty string.
   if (findNoteIdPtr != noteIds.end()) {
-    QFile file(notesDirectory + "/notes/" +
-               QString::number(findNoteIdPtr->second));
+    QFile file(getPathToText(findNoteIdPtr->second));
     file.open(QIODevice::ReadOnly);
     result = QString(file.readAll());
     file.close();
@@ -156,12 +160,11 @@ QString Storage::getTextFromNote(QListWidgetItem *notePtr) {
 }
 
 void Storage::addNotesFromStorage(QListWidget &widget, const QIcon &icon) {
-  auto notes{noteInform["notes"].toObject()};
-  for (const auto &noteKey : notes.keys()) {
-    // Get inforamtion about note.
-    auto id{noteKey.toUInt()};
-    auto noteObject{notes[noteKey].toObject()};
-    auto title{noteObject["title"].toString()};
+  auto notes{noteInform[jsConst.notes].toObject()};
+  for (const auto &id : notes.keys()) {
+    // Get information about note.
+    auto noteObject{notes[id].toObject()};
+    auto title{noteObject[jsConst.noteTitle].toString()};
     // Create new note and add it.
     auto notePtr = new QListWidgetItem(icon, title, &widget);
     noteIds.insert({notePtr, id});

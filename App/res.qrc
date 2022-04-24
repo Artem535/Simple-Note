@@ -3,5 +3,7 @@
         <file>res/fonts/Inter-Regular.ttf</file>
         <file>res/icons/journal-plus.svg</file>
         <file>res/icons/journal-text.svg</file>
+        <file>res/icons/journal-check.svg</file>
+        <file>res/icons/journal-x.svg</file>
     </qresource>
 </RCC>

@@ -2,19 +2,14 @@
 #include "./ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), NOT_SAVE_MARK('*') {
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   // Create new buttons(`add new note`) to toolbar.
-  {
-    QIcon icon(":res/icons/journal-plus.svg");
-    ui->toolBar->addAction(icon, "Add new note.", this,
-                           &MainWindow::createNewNote);
-  }
+  ui->toolBar->addAction(style.notePlusIcon, "Add new note.", this,
+                         &MainWindow::createNewNote);
+
   // Load information from storage about notes.
-  {
-    QIcon icon(":/res/icons/journal-text.svg");
-    storage.addNotesFromStorage(*ui->listWidget, icon);
-  }
+  storage.addNotesFromStorage(*ui->listWidget, style.noteIcon);
   // Connect buttons.
   connect(ui->saveButton, &QAbstractButton::clicked, this,
           &MainWindow::saveNote);
@@ -25,12 +20,15 @@ MainWindow::MainWindow(QWidget *parent)
           &MainWindow::displayNote);
   connect(ui->searchLine, &QLineEdit::textChanged, this,
           &MainWindow::textSearchLineEdited);
-  // Hode tab bar.
+  // Hide tab bar.
   ui->tabWidget->tabBar()->hide();
   // Add font to applications.
   QFontDatabase::addApplicationFont(":/res/fonts/Inter-Regular.ttf");
   // Set default screen.
-  ui->tabWidget->setCurrentIndex(1);
+  ui->tabWidget->setCurrentIndex(screenState::clear);
+  // Add icons to button.
+  ui->saveButton->setIcon(style.noteSaveIcon);
+  ui->deleteButton->setIcon(style.noteRemoveIcon);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -43,17 +41,17 @@ void MainWindow::toggleSaveMark(QListWidgetItem *notePtr, bool addMark) {
 
 void MainWindow::toggleSaveMark(QString &str, bool addMark) {
   // All note title with last symbal equal `SAVE_MARK` marked as not saved.
-  if (str.back() == NOT_SAVE_MARK && !addMark) {
+  if (str.back() == style.notSavedMark && !addMark) {
     str.chop(1);
   } else if (addMark) {
-    str.push_back(NOT_SAVE_MARK);
+    str.push_back(style.notSavedMark);
   }
 }
 
 void MainWindow::createNewNote() {
   // Create and add icon.
-  QIcon icon(":/res/icons/journal-text.svg");
-  auto newNotePtr = new QListWidgetItem(icon, "New note", ui->listWidget);
+  auto newNotePtr =
+      new QListWidgetItem(style.noteIcon, "New note", ui->listWidget);
 
   // Add in storage and display.
   toggleSaveMark(newNotePtr, true);
@@ -62,7 +60,7 @@ void MainWindow::createNewNote() {
 }
 
 void MainWindow::displayNote(QListWidgetItem *item) {
-  ui->tabWidget->setCurrentIndex(0);
+  ui->tabWidget->setCurrentIndex(screenState::note);
   auto title{item->text()};
   toggleSaveMark(title);
   ui->titleNote->setText(title);
@@ -92,7 +90,7 @@ void MainWindow::deleteNote() {
     // Remove from ListWidgets.
     ui->listWidget->removeItemWidget(ui->listWidget->takeItem(selectedRow));
     // Show empty screen.
-    ui->tabWidget->setCurrentIndex(0);
+    ui->tabWidget->setCurrentIndex(screenState::clear);
   }
 }
 
