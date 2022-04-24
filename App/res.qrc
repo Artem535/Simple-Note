@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/fonts/Inter-Regular.ttf</file>
+        <file>res/icons/journal-plus.svg</file>
+        <file>res/icons/journal-text.svg</file>
+    </qresource>
+</RCC>

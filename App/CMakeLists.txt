@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
         mainwindow.ui
         storage.h
         storage.cpp
+        res.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

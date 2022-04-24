@@ -155,7 +155,7 @@ QString Storage::getTextFromNote(QListWidgetItem *notePtr) {
   return result;
 }
 
-void Storage::addNotesFromStorage(QListWidget &widget) {
+void Storage::addNotesFromStorage(QListWidget &widget, const QIcon &icon) {
   auto notes{noteInform["notes"].toObject()};
   for (const auto &noteKey : notes.keys()) {
     // Get inforamtion about note.
@@ -163,7 +163,15 @@ void Storage::addNotesFromStorage(QListWidget &widget) {
     auto noteObject{notes[noteKey].toObject()};
     auto title{noteObject["title"].toString()};
     // Create new note and add it.
-    auto notePtr = new QListWidgetItem(title, &widget);
+    auto notePtr = new QListWidgetItem(icon, title, &widget);
     noteIds.insert({notePtr, id});
   }
+}
+
+QList<QListWidgetItem *> Storage::getNotesPointers() {
+  QList<QListWidgetItem *> result;
+  for (const auto &item : noteIds) {
+    result.push_back(item.first);
+  }
+  return result;
 }

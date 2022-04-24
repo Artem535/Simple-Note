@@ -85,5 +85,7 @@ public:
    * @brief addNotesFromStorage
    * @param widget
    */
-  void addNotesFromStorage(QListWidget &widget);
+  void addNotesFromStorage(QListWidget &widget, const QIcon &icon);
+
+  QList<QListWidgetItem *> getNotesPointers();
 };

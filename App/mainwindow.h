@@ -1,6 +1,7 @@
 #pragma once
 
 #include "storage.h"
+#include <QFontDatabase>
 #include <QListWidget>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -52,7 +53,12 @@ public slots:
    */
   void deleteNote();
 
+  /**
+   * @brief clearScreen
+   */
   void clearScreen();
+
+  void textSearchLineEdited(const QString &newText);
 
 private:
   Storage storage;
