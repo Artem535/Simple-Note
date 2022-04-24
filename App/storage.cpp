@@ -1,6 +1,13 @@
 #include "storage.h"
 
 void Storage::readNotesInformation(const QString &pathToFile) {
+  if (!QFile::exists(pathToFile)) {
+    auto functionName{"readNotesInformation"};
+    QString message{"Error in function `%1`. File `%2` not exists."};
+    message = message.arg(functionName).arg(pathToFile);
+    std::runtime_error(message.toStdString());
+  }
+
   QFile file(pathToFile);
   file.open(QIODevice::ReadOnly);
   noteInform = QJsonDocument::fromJson(file.readAll()).object();
@@ -8,6 +15,13 @@ void Storage::readNotesInformation(const QString &pathToFile) {
 }
 
 void Storage::saveNotesInformation() {
+  if (!QFile::exists(paths.inform)) {
+    auto functionName{"saveNotesInformation"};
+    QString message{"Error in function `%1`. File `%2` not exists."};
+    message = message.arg(functionName).arg(paths.inform);
+    std::runtime_error(message.toStdString());
+  }
+
   QFile file(paths.inform);
   file.open(QIODevice::WriteOnly);
   QJsonDocument outputDoc;
@@ -43,7 +57,7 @@ void Storage::addNoteInInformFile(const QString &id, const QString &title) {
   value.insert(jsConst.pathToFile, getPathToText(id));
   value.insert(jsConst.noteTitle, title);
   // Qt can't change value 'complex' object.
-  // We needed get object, insert new object in array, then replace `notes`
+  // We needed get object, insert new object in object, then replace `notes`
   // object.
   auto notesObject{noteInform[jsConst.notes].toObject()};
   notesObject.insert(id, value);
@@ -55,6 +69,7 @@ QString Storage::getPathToText(const QString &id) {
 }
 
 void Storage::saveNoteTextFile(const QString &id, const QString &text) {
+  // If file not found, it will be create.
   QFile file{getPathToText(id)};
   file.open(QIODevice::WriteOnly);
   file.write(text.toStdString().c_str());
@@ -95,6 +110,14 @@ void Storage::removeNote(QListWidgetItem *notePtr) {
   bool noteExist = findedNote != noteIds.end();
   if (noteExist) {
     auto id{findedNote->second};
+    // Check that file exists.
+    if (!QFile::exists(getPathToText(id))) {
+      auto functionName{"removeNote"};
+      QString message{"Error in function `%1`. File `%2` not exists."};
+      message = message.arg(functionName).arg(getPathToText(id));
+      std::runtime_error(message.toStdString());
+    }
+
     // Remove text note
     QFile::remove(getPathToText(id));
     // Remove information about note.
@@ -150,6 +173,15 @@ QString Storage::getTextFromNote(QListWidgetItem *notePtr) {
   // If we find note, read text from file and return it,
   // else return empty string.
   if (findNoteIdPtr != noteIds.end()) {
+    auto pathToFile{getPathToText(findNoteIdPtr->second)};
+    // Check exists file.
+    if (!QFile::exists(pathToFile)) {
+      auto functionName{"getTextFromNote"};
+      QString message{"Error in function `%1`. File `%2` not exists."};
+      message = message.arg(functionName).arg(pathToFile);
+      std::runtime_error(message.toStdString());
+    }
+
     QFile file(getPathToText(findNoteIdPtr->second));
     file.open(QIODevice::ReadOnly);
     result = QString(file.readAll());

@@ -7,7 +7,9 @@
 #include <QList>
 #include <QListWidgetItem>
 #include <QString>
+#include <stdexcept>
 #include <map>
+#include <stdexcept>
 
 struct Paths {
   QString workDir;
@@ -38,129 +40,116 @@ class Storage {
 
   // TODO: Write coments.
   /**
-   * @brief 
-   * 
-   * @param pathToFile 
+   * @brief Read informations about notes.
+   * @param pathToFile
    */
   void readNotesInformation(const QString &pathToFile);
-  
+
   /**
-   * @brief 
-   * 
+   * @brief Save information about notes in `inform.json`.
    */
   void saveNotesInformation();
-  
+
   /**
-   * @brief Get the Storage Directory object
-   * 
-   * @return QString 
+   * @brief Get the Storage Directory object.
+   * @return QString -- The path to the directory where all files are located.
    */
   QString getStorageDirectory();
-  
+
   /**
-   * @brief Create a First Init Files object
-   * 
+   * @brief Create a First Init Files object.
+   * Create `inform.json`, `notes` directory and note.
    */
   void createFirstInitFiles();
-  
+
   /**
-   * @brief 
-   * 
-   * @param id 
-   * @param title 
+   * @brief Update information about notes.
+   * @param id -- Id note.
+   * @param title -- Title note.
    */
   void addNoteInInformFile(const QString &id, const QString &title);
-  
+
   /**
-   * @brief 
-   * 
-   * @param id 
-   * @param text 
+   * @brief Save text note in file.
+   * @param id -- Id note.
+   * @param text -- Text of the note.
    */
   void saveNoteTextFile(const QString &id, const QString &text);
-  
+
   /**
-   * @brief Get the Path To Text object
-   * 
-   * @param id 
-   * @return QString 
+   * @brief Get the Path To Text object.
+   * @param id -- Id note.
+   * @return QString -- Path to text file for note with special id.
    */
   QString getPathToText(const QString &id);
-  
+
 public:
   /**
-   * @brief Construct a new Storage object
-   * 
+   * @brief Construct a new Storage object.
    */
   Storage();
 
- /**
-  * @brief Get the Free Id object
-  * 
-  * @return unsigned int 
-  */
+  /**
+   * @brief Get the Free Id.
+   * @return QString -- A free id that can be used.
+   */
   QString getFreeId();
 
- /**
-  * @brief Get the Notes Titles object
-  * 
-  * @return QList<QString> 
-  */
+  /**
+   * @brief Get the Notes Titles object.
+   * @return QList<QString> -- All note titles in storage.
+   */
   QList<QString> getNotesTitles();
 
   /**
-   * @brief 
-   * 
-   * @param notePtr 
+   * @brief Remove note from storage.
+   * Function remove all information about note from `inform.json`.
+   * Also remove file with text for note.
+   * @param notePtr -- Pointer on note in QListWidget.
    */
   void removeNote(QListWidgetItem *notePtr);
 
   /**
-   * @brief 
-   * 
-   * @param notePtr 
-   * @param title 
-   * @param text 
+   * @brief Add note in storage.
+   * @param notePtr -- Pointer on item in QListWidget.
+   * @param title -- Title of the note.
+   * @param text -- Text of the note.
    */
   void addNote(QListWidgetItem *notePtr, const QString &title,
                const QString &text);
 
   /**
-   * @brief 
-   * 
-   * @param notePtr 
-   * @param newTitle 
+   * @brief Change title of the note in storage.
+   * @param notePtr -- Pointer on note in QListWidget.
+   * @param newTitle -- New title of the note.
    */
   void renameNote(QListWidgetItem *notePtr, const QString &newTitle);
 
   /**
-   * @brief 
-   * 
-   * @param notePtr 
-   * @param newText 
+   * @brief Change text of the note.
+   * @param notePtr -- Pointer on note in QListWidget.
+   * @param newText -- New text of the note.
    */
   void changeNoteText(QListWidgetItem *notePtr, const QString &newText);
 
   /**
-   * @brief Get the Text From Note object
-   * 
-   * @param notePtr 
-   * @return QString 
+   * @brief Get the Text From Note object.
+   * @param notePtr -- Pointer on note in QListWidget.
+   * @return QString -- Text of the note.
    */
   QString getTextFromNote(QListWidgetItem *notePtr);
 
   /**
-   * @brief 
-   * 
-   * @param widget 
-   * @param icon 
+   * @brief Read information about notes from storage,
+   * and add it QListWidget. Also add icon to QListWidgetItem.
+   * @param widget
+   * @param icon
    */
   void addNotesFromStorage(QListWidget &widget, const QIcon &icon);
-  
+
   /**
    * @brief Get the Notes Pointers object
-   * 
-   * @return QList<QListWidgetItem *> 
+   * @return QList<QListWidgetItem *>
    */
   QList<QListWidgetItem *> getNotesPointers();
 };
