@@ -1,1 +1,32 @@
+= Simple Note
+Its applications can create and store your notes. 
 
+== Features
+
+* It can save your notes after you exit the app. But don't forgive saves you note (for this you need to push Save button).
+* It supports Markdown syntax. Check note Markdown example.
+* You can change font and font size.
+* It builds on Qt, so it will be looked like your system.
+
+== Building application
+=== Dependency 
+For building these applications you need qt, C++ compiler and cmake.
+For fedora system, it can be installed with this command:
+
+[source, shell]
+----
+dnf install qt6-qtbase qt6-qtbase-gui qt6-qtsvg cmake ninja-build clang
+----
+
+`ninja-build` can be replaced on `make`.
+
+=== Building 
+[source, shell]
+----
+git clone git@github.com:Artem535/Simple-Note.git
+cd Simple-Note
+mkdir build
+cd build
+cmake ../App/ -DCMAKE_BUILD_TYPE:STRING=MinSizeRel -G Ninja
+ninja
+----
