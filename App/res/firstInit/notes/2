@@ -1,0 +1,102 @@
+## Headings
+
+To create a heading, add number signs (#) in front of a word or phrase. The
+number of number signs you use should correspond to the heading level.
+
+# Heading level 1
+
+## Heading level 2	
+
+### Heading level 3		
+
+#### Heading level 4
+
+##### Heading level 5
+
+###### Heading level 6
+
+- - -
+## Emphasis
+
+**This is bold text**
+
+**This is bold text**
+
+*This is italic text*
+
+*This is italic text*
+
+~~Strikethrough~~
+
+***Bold and italic***
+
+- - -
+## Blockquotes
+
+To create a blockquote, add a > in front of a paragraph.
+
+> blockquotes
+
+**Nested Blockquotes**
+
+Blockquotes can be nested. Add a >> in front of the paragraph you want to nest.
+
+> Blockquote
+
+> > Nested Blockquote
+
+- - -
+## Lists
+
+You can organize items into ordered and unordered lists.
+
+### Ordered Lists
+
+To create an ordered list, add line items with numbers followed by periods. The
+numbers don’t have to be in numerical order, but the list should start with the
+number one.
+
+1.  First item
+2.  Second item
+3.  Third item
+4.  Fourth item
+
+or
+
+1.  First item
+2.  Second item
+3.  Third item
+    1.  Indented item
+    2.  Indented item
+4.  Fourth item
+
+### Unordered Lists
+
+To create an unordered list, add dashes (-), asterisks (*), or plus signs (+)
+in front of line items. Indent one or more items to create a nested list.
+
+- First item
+- Second item
+- Third item
+  - Indented item
+  - Indented item
+- Fourth item
+
+## Task list
+
+- [x] Done.
+- [ ] Not done.
+
+## Tables
+
+
+|Tables  |Are          |Cool |
+|--------|-------------|-----|
+|col 1 is|left-aligned |$1600|
+|col 2 is|centered     |$12  |
+|col 3 is|right-aligned|$1   |
+
+## Links
+
+[More examples](https://www.markdownguide.org/basic-syntax/)
+

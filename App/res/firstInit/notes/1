@@ -1,0 +1,26 @@
+Hi, it's *"Simple Note"*. Its applications can create and store your notes. It
+has some features:
+
+* It can save your notes after you exit the app. But don't forgive saves you
+  note (for this you need to push `Save` button).
+* It supports Markdown syntax. Check note ***Markdown example***.
+* You can change font and font size.
+* It builds on Qt, so it will be looked like your system.
+
+A few **important** moments:
+
+1.  All note opens *only for read*. For change text you need push button `Edit`.
+2.  Don't forgive about saves your note.
+3.  Don't use hiding content, you lose content.
+
+- - -
+What will be added or changed in future:
+
+* Add image support.
+  * Add image from source.
+  * Drag and drop support.
+* Add spell check support.
+* Update UI.
+
+Yep, it's all. Have a nice day :)
+

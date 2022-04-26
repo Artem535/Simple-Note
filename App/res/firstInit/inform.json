@@ -1,0 +1,14 @@
+{
+    "free id": [
+    ],
+    "notes": {
+        "1": {
+            "file": "/home/artem/.SimpleNote/notes/1",
+            "title": "Start here!"
+        },
+        "2": {
+            "file": "/home/artem/.SimpleNote/notes/2",
+            "title": "Markdown example"
+        }
+    }
+}

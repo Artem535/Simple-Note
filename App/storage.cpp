@@ -2,10 +2,8 @@
 
 void Storage::readNotesInformation(const QString &pathToFile) {
   if (!QFile::exists(pathToFile)) {
-    auto functionName{"readNotesInformation"};
-    QString message{"Error in function `%1`. File `%2` not exists."};
-    message = message.arg(functionName).arg(pathToFile);
-    std::runtime_error(message.toStdString());
+    std::runtime_error(
+        "Error in function `readNotesInformation` File not exists");
   }
 
   QFile file(pathToFile);
@@ -16,10 +14,8 @@ void Storage::readNotesInformation(const QString &pathToFile) {
 
 void Storage::saveNotesInformation() {
   if (!QFile::exists(paths.inform)) {
-    auto functionName{"saveNotesInformation"};
-    QString message{"Error in function `%1`. File `%2` not exists."};
-    message = message.arg(functionName).arg(paths.inform);
-    std::runtime_error(message.toStdString());
+    std::runtime_error(
+        "Error in function `saveNotesInformation`. File not exists.");
   }
 
   QFile file(paths.inform);
@@ -38,19 +34,27 @@ QString Storage::getStorageDirectory() {
 }
 
 void Storage::createFirstInitFiles() {
-  // Create notes informations.
-  QFile file{paths.inform};
-  file.open(QIODevice::WriteOnly);
-  QString emptyTemplate{"{\"%1\": [\"0\"], \"%2\": {}}"};
-  emptyTemplate = emptyTemplate.arg(jsConst.freeId).arg(jsConst.notes);
-  file.write(emptyTemplate.toStdString().c_str());
-  file.close();
-
   // Create directory for text notes.
   QDir directory{paths.workDir};
   directory.mkdir(jsConst.notes);
+  // paths to needed files
+  auto firstNote = paths.notesDir + "1";
+  auto secondNote = paths.notesDir + "2";
+  // Copy files from res.
+  bool copySuccessful{false};
+  copySuccessful += QFile::copy("://res/firstInit/inform.json", paths.inform);
+  copySuccessful += QFile::copy("://res/firstInit/notes/1", firstNote);
+  copySuccessful += QFile::copy("://res/firstInit/notes/2", secondNote);
+  if (!copySuccessful) {
+    throw std::runtime_error(
+        "Error in function `createFirstInitFiles`. Files not copy.");
+  }
+  // Change permisson
+  for (auto &path : {paths.inform, firstNote, secondNote}) {
+    QFile::setPermissions(path, QFileDevice::Permission::WriteOwner |
+                                    QFileDevice::Permission::ReadOwner);
+  }
 }
-
 void Storage::addNoteInInformFile(const QString &id, const QString &title) {
   // Create `value`: {"path to file": ..., "title": ...}
   QJsonObject value;
@@ -112,10 +116,7 @@ void Storage::removeNote(QListWidgetItem *notePtr) {
     auto id{findedNote->second};
     // Check that file exists.
     if (!QFile::exists(getPathToText(id))) {
-      auto functionName{"removeNote"};
-      QString message{"Error in function `%1`. File `%2` not exists."};
-      message = message.arg(functionName).arg(getPathToText(id));
-      std::runtime_error(message.toStdString());
+      std::runtime_error("Error in function `removeNote`. File not exists.");
     }
 
     // Remove text note
@@ -127,6 +128,7 @@ void Storage::removeNote(QListWidgetItem *notePtr) {
     // Add `id` in array with free id.
     auto freeIdArray{noteInform[jsConst.freeId].toArray()};
     freeIdArray.push_back(id);
+    noteInform[jsConst.freeId] = freeIdArray;
   }
   saveNotesInformation();
 }
@@ -159,6 +161,7 @@ void Storage::renameNote(QListWidgetItem *notePtr, const QString &newTitle) {
 void Storage::changeNoteText(QListWidgetItem *notePtr, const QString &newText) {
   auto findedNote{noteIds.find(notePtr)};
   if (findedNote != noteIds.end()) {
+    // If file not found it will be create.
     QFile file(getPathToText(findedNote->second));
     file.open(QIODevice::WriteOnly);
     file.write(newText.toStdString().c_str());
@@ -176,10 +179,8 @@ QString Storage::getTextFromNote(QListWidgetItem *notePtr) {
     auto pathToFile{getPathToText(findNoteIdPtr->second)};
     // Check exists file.
     if (!QFile::exists(pathToFile)) {
-      auto functionName{"getTextFromNote"};
-      QString message{"Error in function `%1`. File `%2` not exists."};
-      message = message.arg(functionName).arg(pathToFile);
-      std::runtime_error(message.toStdString());
+      std::runtime_error(
+          "Error in function `getTextFromNote`. File not exists");
     }
 
     QFile file(getPathToText(findNoteIdPtr->second));

@@ -103,6 +103,12 @@ QTabWidget{
                <height>33</height>
               </size>
              </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>33</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <pointsize>12</pointsize>
@@ -121,7 +127,7 @@ QTabWidget{
              <property name="minimumSize">
               <size>
                <width>80</width>
-               <height>28</height>
+               <height>33</height>
               </size>
              </property>
              <property name="font">
@@ -143,7 +149,7 @@ QTabWidget{
              <property name="minimumSize">
               <size>
                <width>89</width>
-               <height>28</height>
+               <height>33</height>
               </size>
              </property>
              <property name="font">
@@ -164,11 +170,122 @@ QTabWidget{
          </widget>
         </item>
         <item>
+         <widget class="QWidget" name="widget_2" native="true">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>42</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Font size</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="fontSizeBox">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="minimum">
+              <number>13</number>
+             </property>
+             <property name="value">
+              <number>13</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFontComboBox" name="fontComboBox">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>200</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="editButton">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Edit</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QTextEdit" name="textNote">
           <property name="font">
            <font>
-            <pointsize>13</pointsize>
+            <pointsize>12</pointsize>
            </font>
+          </property>
+          <property name="acceptRichText">
+           <bool>false</bool>
           </property>
           <property name="placeholderText">
            <string>Note text.</string>

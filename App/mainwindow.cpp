@@ -12,18 +12,27 @@ MainWindow::MainWindow(QWidget *parent)
   storage.addNotesFromStorage(*ui->listWidget, style.noteIcon);
   // Connect buttons.
   connect(ui->saveButton, &QAbstractButton::clicked, this,
-          &MainWindow::saveNote);
+          &MainWindow::saveNoteButtonPush);
   connect(ui->deleteButton, &QAbstractButton::clicked, this,
-          &MainWindow::deleteNote);
+          &MainWindow::removeNoteButtonPush);
+  connect(ui->editButton, &QAbstractButton::clicked, this,
+          &MainWindow::editButtonPush);
   // Connect actions.
   connect(ui->listWidget, &QListWidget::itemClicked, this,
           &MainWindow::displayNote);
   connect(ui->searchLine, &QLineEdit::textChanged, this,
           &MainWindow::textSearchLineEdited);
+  connect(ui->fontComboBox, &QFontComboBox::currentFontChanged, this,
+          &MainWindow::fontNoteChanged);
+  connect(ui->fontSizeBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+          &MainWindow::fontNoteSizeChanged);
+  connect(ui->editButton, &QAbstractButton::clicked, this,
+          &MainWindow::textNoteChanged);
+
   // Hide tab bar.
   ui->tabWidget->tabBar()->hide();
   // Add font to applications.
-  QFontDatabase::addApplicationFont(":/res/fonts/Inter-Regular.ttf");
+  QFontDatabase::addApplicationFont("://res/fonts/Inter-Regular.ttf");
   // Set default screen.
   ui->tabWidget->setCurrentIndex(screenState::clear);
   // Add icons to button.
@@ -41,17 +50,26 @@ void MainWindow::toggleSaveMark(QListWidgetItem *notePtr, bool addMark) {
 
 void MainWindow::toggleSaveMark(QString &str, bool addMark) {
   // All note title with last symbal equal `SAVE_MARK` marked as not saved.
-  if (str.back() == style.notSavedMark && !addMark) {
+  bool withSaveMark = str.back() == constants.notSavedMark;
+  if (withSaveMark && !addMark) {
     str.chop(1);
-  } else if (addMark) {
-    str.push_back(style.notSavedMark);
+  } else if (addMark && !withSaveMark) {
+    str.push_back(constants.notSavedMark);
   }
+}
+
+void MainWindow::showErrorMessage(const QString &text) {
+  QMessageBox box;
+  box.setWindowTitle("Error!");
+  box.setIcon(QMessageBox::Icon::Critical);
+  box.setText(text);
+  box.exec();
 }
 
 void MainWindow::createNewNote() {
   // Create and add icon.
-  auto newNotePtr =
-      new QListWidgetItem(style.noteIcon, "New note", ui->listWidget);
+  auto newNotePtr = new QListWidgetItem(style.noteIcon, constants.newNoteName,
+                                        ui->listWidget);
 
   // Add in storage and display.
   toggleSaveMark(newNotePtr, true);
@@ -60,33 +78,52 @@ void MainWindow::createNewNote() {
 }
 
 void MainWindow::displayNote(QListWidgetItem *item) {
+  // Set note only for read.
+  noteReadOnly(true);
+  // Change screen.
   ui->tabWidget->setCurrentIndex(screenState::note);
+  // Set title.
   auto title{item->text()};
   toggleSaveMark(title);
   ui->titleNote->setText(title);
-
-  auto text{storage.getTextFromNote(item)};
-  ui->textNote->setHtml(text);
+  // Set text.
+  try {
+    auto text{storage.getTextFromNote(item)};
+    ui->textNote->setMarkdown(text);
+  } catch (const std::runtime_error &error) {
+    showErrorMessage(error.what());
+  }
+  // Set font size in spin box and font family in box.
 }
 
-void MainWindow::saveNote() {
+void MainWindow::saveNoteButtonPush() {
   auto notePtr = ui->listWidget->currentItem();
   // notePtr can be null ptr.
   if (notePtr != nullptr) {
     notePtr->setText(ui->titleNote->text());
-    storage.addNote(notePtr, ui->titleNote->text(), ui->textNote->toHtml());
+    try {
+      storage.addNote(
+          notePtr, ui->titleNote->text(),
+          ui->textNote->toMarkdown(QTextDocument::MarkdownDialectCommonMark));
+    } catch (const std::runtime_error &error) {
+      showErrorMessage(error.what());
+    }
   }
 }
 
-void MainWindow::deleteNote() {
+void MainWindow::removeNoteButtonPush() {
   auto reply = QMessageBox::question(
       this, "Delete note", "Are you sure you want to delete this note?",
       QMessageBox::Yes | QMessageBox::No);
 
   if (reply == QMessageBox::Yes) {
     auto selectedRow = ui->listWidget->currentRow();
-    // Remove from storage.
-    storage.removeNote(ui->listWidget->currentItem());
+    try {
+      // Remove from storage.
+      storage.removeNote(ui->listWidget->currentItem());
+    } catch (const std::runtime_error &error) {
+      showErrorMessage(error.what());
+    }
     // Remove from ListWidgets.
     ui->listWidget->removeItemWidget(ui->listWidget->takeItem(selectedRow));
     // Show empty screen.
@@ -99,8 +136,8 @@ void MainWindow::clearScreen() {
   ui->textNote->clear();
 }
 
-void MainWindow::textSearchLineEdited(const QString &newText) {
-  auto findedItems{ui->listWidget->findItems(newText, Qt::MatchContains)};
+void MainWindow::textSearchLineEdited(const QString &filter) {
+  auto findedItems{ui->listWidget->findItems(filter, Qt::MatchContains)};
   for (auto items : storage.getNotesPointers()) {
     if (!findedItems.contains(items)) {
       items->setHidden(true);
@@ -108,4 +145,36 @@ void MainWindow::textSearchLineEdited(const QString &newText) {
       items->setHidden(false);
     }
   }
+}
+
+void MainWindow::editButtonPush() {
+
+  if (ui->editButton->isChecked()) {
+    noteReadOnly(false);
+    ui->textNote->setText(
+        ui->textNote->toMarkdown(QTextDocument::MarkdownDialectCommonMark));
+  } else {
+    noteReadOnly(true);
+    ui->textNote->setMarkdown(ui->textNote->toPlainText());
+  }
+}
+
+void MainWindow::noteReadOnly(bool readOnly) {
+  ui->titleNote->setReadOnly(readOnly);
+  ui->textNote->setReadOnly(readOnly);
+}
+
+void MainWindow::fontNoteChanged(const QFont &font) {
+  ui->textNote->setFont(font);
+  ui->textNote->update();
+}
+
+void MainWindow::fontNoteSizeChanged(int newSize) {
+  ui->textNote->selectAll();
+  ui->textNote->setFontPointSize(newSize);
+  ui->textNote->update();
+}
+
+void MainWindow::textNoteChanged() {
+  toggleSaveMark(ui->listWidget->currentItem(), true);
 }

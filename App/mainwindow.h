@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
+#include <QSpinBox>
 #include <QSvgRenderer>
 
 QT_BEGIN_NAMESPACE
@@ -18,6 +19,12 @@ namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+struct Constans {
+  const QChar notSavedMark;
+  const QString newNoteName;
+  Constans() : notSavedMark('*'), newNoteName("New note.") {}
+};
 
 /**
  * @brief The Style struct
@@ -27,17 +34,15 @@ struct Style {
   QIcon notePlusIcon;
   QIcon noteSaveIcon;
   QIcon noteRemoveIcon;
-  QString newNoteName;
-  QChar notSavedMark;
 
-  Style() : newNoteName("New note"), notSavedMark('*') {
+  Style() {
     QPixmap notePlusIcon{
-        svgToPixmap({512, 512}, ":res/icons/journal-plus.svg")};
-    QPixmap noteIcon{svgToPixmap({512, 512}, ":/res/icons/journal-text.svg")};
+        svgToPixmap({512, 512}, "://res/icons/journal-plus.svg")};
+    QPixmap noteIcon{svgToPixmap({512, 512}, "://res/icons/journal-text.svg")};
     QPixmap noteSaveIcon{
-        svgToPixmap({512, 512}, ":/res/icons/journal-check.svg")};
+        svgToPixmap({512, 512}, "://res/icons/journal-check.svg")};
     QPixmap noteRemoveIcon{
-        svgToPixmap({512, 512}, ":/res/icons/journal-x.svg")};
+        svgToPixmap({512, 512}, "://res/icons/journal-x.svg")};
 
     auto textColor{QApplication::palette().text().color()};
     changeColor(notePlusIcon, textColor);
@@ -87,53 +92,106 @@ public:
   ~MainWindow();
 
   /**
-   * @brief toggleSaveMark
+   * @brief toggleSaveMark.
+   * Add or remove to text QListWidgetItem mark `notSaved`.
    * @param notePtr
    */
   void toggleSaveMark(QListWidgetItem *notePtr, bool addMark = false);
 
   /**
-   * @brief toggleSaveMark
+   * @brief toggleSaveMark.
+   * Add or remove to string mark `notSaved`.
    * @param str
    */
   void toggleSaveMark(QString &str, bool addMark = false);
 
+  /**
+   * @brief showErrorMessage.
+   * Show window with error icon and specific text.
+   * @param text -- Text error message.
+   */
+  void showErrorMessage(const QString &text);
+
 public slots:
   /**
-   * @brief createNewNote
+   * @brief createNewNote.
+   * Create new note.
    */
   void createNewNote();
 
   /**
-   * @brief displayNote
+   * @brief displayNote.
+   * Dispaly text and title note.
    * @param item
    */
   void displayNote(QListWidgetItem *item);
 
   /**
-   * @brief saveNote
+   * @brief saveNote.
+   * Called when the save button is clicked.
+   * Save title and text into `storage`.
    */
-  void saveNote();
+  void saveNoteButtonPush();
 
   /**
-   * @brief deleteNote
+   * @brief deleteNote.
+   * Remove current QListWidgetItem from storage and QListWidget.
    */
-  void deleteNote();
+  void removeNoteButtonPush();
 
   /**
-   * @brief clearScreen
+   * @brief clearScreen.
+   * Show 'clear' screen and remove text from ui->textNote, ui->titleNote.
    */
   void clearScreen();
 
   /**
-   * @brief textSearchLineEdited
+   * @brief textSearchLineEdited. Filters QListWidget.
+   * Shows only those QListWidgetItem in the `text` of which contains string
+   * `filter`.
    * @param newText
    */
-  void textSearchLineEdited(const QString &newText);
+  void textSearchLineEdited(const QString &filter);
+
+  /**
+   * @brief editButtonPush.
+   * Convert text from markDown to plainText.
+   * Disable `readOnly` from `ui->titleNote` and `ui->textNote`.
+   */
+  void editButtonPush();
+
+  /**
+   * @brief noteReadOnly.
+   * Make note only for read.
+   * Sets the property `readOnly` to `ui->titleNote` and `ui->textNote`.
+   * @param readOnly -- State.
+   */
+  void noteReadOnly(bool readOnly);
+
+  /**
+   * @brief fontNoteChanged.
+   * Change current note in `ui->textNote`.
+   * @param font -- New font.
+   */
+  void fontNoteChanged(const QFont &font);
+
+  /**
+   * @brief fontNoteSizeChanged
+   * int i -- New size font.
+   */
+  void fontNoteSizeChanged(int newSize);
+
+  /**
+   * @brief textNoteChanged
+   * The function is called to change the `text` of the current QListWidgetItem.
+   * It is marked as not being saved.
+   */
+  void textNoteChanged();
 
 private:
   Storage storage;
   Ui::MainWindow *ui;
   const Style style;
+  Constans constants;
   enum screenState { note = 0, clear };
 };

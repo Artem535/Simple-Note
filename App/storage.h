@@ -7,7 +7,6 @@
 #include <QList>
 #include <QListWidgetItem>
 #include <QString>
-#include <stdexcept>
 #include <map>
 #include <stdexcept>
 
@@ -17,6 +16,7 @@ struct Paths {
   QString inform;
 };
 
+// TODO: Remove `pathToFile`.
 struct JsonConstants {
   const QString freeId;
   const QString notes;
@@ -38,7 +38,6 @@ class Storage {
   QJsonObject noteInform;
   QString nameStorageDir;
 
-  // TODO: Write coments.
   /**
    * @brief Read informations about notes.
    * @param pathToFile
@@ -129,6 +128,7 @@ public:
    * @brief Change text of the note.
    * @param notePtr -- Pointer on note in QListWidget.
    * @param newText -- New text of the note.
+   * @throw std::runtime_error if file not found.
    */
   void changeNoteText(QListWidgetItem *notePtr, const QString &newText);
 
@@ -136,6 +136,7 @@ public:
    * @brief Get the Text From Note object.
    * @param notePtr -- Pointer on note in QListWidget.
    * @return QString -- Text of the note.
+   * @throw std::runtime_error if file not found.
    */
   QString getTextFromNote(QListWidgetItem *notePtr);
 

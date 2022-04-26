@@ -5,5 +5,8 @@
         <file>res/icons/journal-text.svg</file>
         <file>res/icons/journal-check.svg</file>
         <file>res/icons/journal-x.svg</file>
+        <file>res/firstInit/inform.json</file>
+        <file>res/firstInit/notes/1</file>
+        <file>res/firstInit/notes/2</file>
     </qresource>
 </RCC>

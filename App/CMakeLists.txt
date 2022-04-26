@@ -11,8 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Svg REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Svg REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Svg Gui Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Svg Gui Core REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -48,7 +48,9 @@ else()
 endif()
 
 target_link_libraries(SimpleNote PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
-                                         Qt${QT_VERSION_MAJOR}::Svg)
+                                         Qt${QT_VERSION_MAJOR}::Svg 
+                                         Qt${QT_VERSION_MAJOR}::Gui 
+                                         Qt${QT_VERSION_MAJOR}::Core)
 
 set_target_properties(SimpleNote PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
