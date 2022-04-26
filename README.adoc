@@ -15,15 +15,21 @@ For fedora system, it can be installed with this command:
 
 [source, shell]
 ----
-dnf install qt6-qtbase qt6-qtbase-gui qt6-qtsvg cmake ninja-build clang
+dnf install qt6-qtbase-devel qt6-qtbase-gui qt6-qtsvg-devel cmake ninja-build clang
 ----
 
 `ninja-build` can be replaced on `make`.
 
+Also you need git.
+[source, shell]
+----
+dnf install git
+----
+
 === Building 
 [source, shell]
 ----
-git clone git@github.com:Artem535/Simple-Note.git
+git clone https://github.com/Artem535/Simple-Note.git 
 cd Simple-Note
 mkdir build
 cd build

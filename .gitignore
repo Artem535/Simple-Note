@@ -1,0 +1,10 @@
+App/*.user
+*.user
+*.html
+build/*
+App/build/*
+App/build/*
+App/.cache/*
+.vscode/*
+build-App-Clang_Qt_5_15_2-MinSizeRel/*
+build-App-Clang_Qt_5_15_2-Debug/*
