@@ -78,6 +78,7 @@ void MainWindow::createNewNote() {
 }
 
 void MainWindow::displayNote(QListWidgetItem *item) {
+  ui->editButton->setChecked(false);
   // Set note only for read.
   noteReadOnly(true);
   // Change screen.
