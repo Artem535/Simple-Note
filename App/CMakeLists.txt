@@ -11,6 +11,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_C_COMPILER "clang")
+set(CMAKE_CXX_COMPILER "clang++")
+
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Svg Gui Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Svg Gui Core REQUIRED)
 

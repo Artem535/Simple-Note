@@ -41,10 +41,10 @@ void Storage::createFirstInitFiles() {
   auto firstNote = paths.notesDir + "1";
   auto secondNote = paths.notesDir + "2";
   // Copy files from res.
-  bool copySuccessful{false};
-  copySuccessful += QFile::copy("://res/firstInit/inform.json", paths.inform);
-  copySuccessful += QFile::copy("://res/firstInit/notes/1", firstNote);
-  copySuccessful += QFile::copy("://res/firstInit/notes/2", secondNote);
+  bool copySuccessful{true};
+  copySuccessful &= QFile::copy("://res/firstInit/inform.json", paths.inform);
+  copySuccessful &= QFile::copy("://res/firstInit/notes/1", firstNote);
+  copySuccessful &= QFile::copy("://res/firstInit/notes/2", secondNote);
   if (!copySuccessful) {
     throw std::runtime_error(
         "Error in function `createFirstInitFiles`. Files not copy.");
